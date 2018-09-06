@@ -3,7 +3,7 @@ package rx
 import (
 	"time"
 
-	p "./pipe"
+	p "github.com/langhuihui/gorx/pipe"
 )
 
 type Observable struct {
@@ -59,7 +59,7 @@ func (this *Observable) Pipe(cbs ...p.Deliver) *Observable {
 	this.source = p.Pipe(this.source, cbs...)
 	return this
 }
-func (this *Observable) Subscribe(n func(interface{}, func()), e func(error), c func())  func() {
+func (this *Observable) Subscribe(n func(interface{}, func()), e func(error), c func()) func() {
 	return p.Subscribe(n, e, c)(this.source)
 }
 func (this *Observable) ToChan(out p.Next) p.Disposable {

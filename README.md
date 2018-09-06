@@ -9,7 +9,7 @@ GoRx's usage is very like RxJs. However implemention by Golang is very different
 in tradition we call `Chain programming`
 
 ```go
-import "http://github.com/langhuihui/gorx"
+import "github.com/langhuihui/gorx"
 rx.Interval(1000).SkipUntil(Of(1).Delay(3000)).Subscribe(func(x interface{}, dispose func()) {
 		fmt.Print(x)
 	}, nil, nil)
@@ -20,7 +20,7 @@ rx.Interval(1000).SkipUntil(Of(1).Delay(3000)).Subscribe(func(x interface{}, dis
 just like rxjs 6.0,but there are still some difference.
 
 ```go
-import . "http://github.com/langhuihui/gorx/pipe"
+import . "github.com/langhuihui/gorx/pipe"
 Subscribe(func(x interface{}, dispose func()) {
 		fmt.Print(x)
 	}, nil, nil)(Interval(1000),SkipUntil(Of(1),Delay(3000)))

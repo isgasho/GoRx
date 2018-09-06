@@ -1,7 +1,7 @@
 package rx
 
 //Subscribe 观察者
-func Subscribe(n func(interface{}, Disposable), e func(error), c func()) func(Observable, ...Deliver) Disposable {
+func Subscribe(n func(interface{}, func()), e func(error), c func()) func(Observable, ...Deliver) Disposable {
 	return func(source Observable, sources ...Deliver) (dispose Disposable) {
 		next := make(Next)
 		stop := make(Stop)
