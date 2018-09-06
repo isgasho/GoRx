@@ -46,7 +46,8 @@ func Interval(period time.Duration) *Observable {
 	return &Observable{p.Interval(period)}
 }
 func (this *Observable) Delay(delay time.Duration) *Observable {
-	return &Observable{p.Delay(delay)(this.source)}
+	this.source = p.Delay(delay)(this.source)
+	return this
 }
 func (this *Observable) StartWith(xs ...p.Any) *Observable {
 	return &Observable{p.StartWith(xs...)(this.source)}
@@ -62,18 +63,22 @@ func (this *Observable) Pipe(cbs ...p.Deliver) *Observable {
 func (this *Observable) Subscribe(n func(interface{}, func()), e func(error), c func()) func() {
 	return p.Subscribe(n, e, c)(this.source)
 }
-func (this *Observable) ToChan(out p.Next) p.Disposable {
+func (this *Observable) ToChan(out p.Next) func() {
 	return p.ToChan(out)(this.source)
 }
 func (this *Observable) Take(count int) *Observable {
-	return &Observable{p.Take(count)(this.source)}
+	this.source = p.Take(count)(this.source)
+	return this
 }
 func (this *Observable) Skip(count int) *Observable {
-	return &Observable{p.Skip(count)(this.source)}
+	this.source = p.Skip(count)(this.source)
+	return this
 }
 func (this *Observable) TakeUntil(sSrc *Observable) *Observable {
-	return &Observable{p.TakeUntil(sSrc.source)(this.source)}
+	this.source = p.TakeUntil(sSrc.source)(this.source)
+	return this
 }
 func (this *Observable) SkipUntil(sSrc *Observable) *Observable {
-	return &Observable{p.SkipUntil(sSrc.source)(this.source)}
+	this.source = p.SkipUntil(sSrc.source)(this.source)
+	return this
 }

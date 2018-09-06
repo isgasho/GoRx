@@ -10,7 +10,7 @@ in tradition we call `Chain programming`
 
 ```go
 import "github.com/langhuihui/gorx"
-rx.Interval(1000).SkipUntil(Of(1).Delay(3000)).Subscribe(func(x interface{}, dispose func()) {
+rx.Interval(1000).SkipUntil(rx.Of(1).Delay(3000)).Subscribe(func(x interface{}, dispose func()) {
 		fmt.Print(x)
 	}, nil, nil)
 ```
