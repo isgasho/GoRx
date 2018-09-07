@@ -33,7 +33,7 @@ func Subscribe(n func(interface{}, func()), e func(error), c func()) func(Observ
 }
 
 //ToChan 用channel方式订阅事件流
-func ToChan(out Next) func(Observable, ...Deliver) Disposable {
+func ToChan(out chan interface{}) func(Observable, ...Deliver) Disposable {
 	return func(source Observable, sources ...Deliver) Disposable {
 		stop := make(Stop)
 		go Pipe(source, sources...)(out, stop)

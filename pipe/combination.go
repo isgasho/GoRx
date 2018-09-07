@@ -174,7 +174,7 @@ func CombineLatest(sources ...Observable) Observable {
 }
 
 //StartWith 先发送一些数据
-func StartWith(xs ...Any) Deliver {
+func StartWith(xs ...interface{}) Deliver {
 	return func(source Observable) Observable {
 		return func(next Next, s Stop) {
 			stopped := false

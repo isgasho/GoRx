@@ -1,7 +1,7 @@
 package rx
 
 //Reduce 累加器，在事件流完成时把结果发出去
-func Reduce(f func(Any, Any) Any, seed ...Any) Deliver {
+func Reduce(f func(interface{}, interface{}) interface{}, seed ...interface{}) Deliver {
 	return func(source Observable) Observable {
 		return func(next Next, stop Stop) {
 			sNext := make(Next)
@@ -42,8 +42,8 @@ func Reduce(f func(Any, Any) Any, seed ...Any) Deliver {
 }
 
 //Count 计数
-func Count(f func(Any) bool) Deliver {
-	return Reduce(func(aac Any, c Any) Any {
+func Count(f func(interface{}) bool) Deliver {
+	return Reduce(func(aac interface{}, c interface{}) interface{} {
 		if f == nil || f(c) {
 			return aac.(int) + 1
 		}

@@ -5,7 +5,7 @@ import (
 )
 
 //Scan 类似Reduce，但每次都会把结果发出去
-func Scan(f func(Any, Any) Any, seed ...Any) Deliver {
+func Scan(f func(interface{}, interface{}) interface{}, seed ...interface{}) Deliver {
 	return func(source Observable) Observable {
 		return func(next Next, stop Stop) {
 			sNext := make(Next)
@@ -43,7 +43,7 @@ func Scan(f func(Any, Any) Any, seed ...Any) Deliver {
 }
 
 //Map 映射
-func Map(f func(Any) Any) Deliver {
+func Map(f func(interface{}) interface{}) Deliver {
 	return deliver(func(d Any, n Next, s Stop) bool {
 		n <- f(d)
 		return true
@@ -51,7 +51,7 @@ func Map(f func(Any) Any) Deliver {
 }
 
 //MapTo 映射到一个固定值
-func MapTo(x Any) Deliver {
+func MapTo(x interface{}) Deliver {
 	return deliver(func(d Any, n Next, s Stop) bool {
 		n <- x
 		return true
@@ -79,7 +79,7 @@ func Pairwise() Deliver {
 }
 
 //SwitchMap 切换数据源
-func SwitchMap(f func(Any) Observable, combineResults func(Any, Any) Any) Deliver {
+func SwitchMap(f func(interface{}) Observable, combineResults func(interface{}, interface{}) interface{}) Deliver {
 	return func(source Observable) Observable {
 		return func(next Next, stop Stop) {
 			waitInnerStop := false
@@ -138,8 +138,8 @@ func SwitchMap(f func(Any) Observable, combineResults func(Any, Any) Any) Delive
 }
 
 //SwitchMapTo 切换到固定的源
-func SwitchMapTo(source Observable, combineResults func(Any, Any) Any) Deliver {
-	return SwitchMap(func(d Any) Observable {
+func SwitchMapTo(source Observable, combineResults func(interface{}, interface{}) interface{}) Deliver {
+	return SwitchMap(func(d interface{}) Observable {
 		return source
 	}, combineResults)
 }

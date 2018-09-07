@@ -17,7 +17,7 @@ func Take(count int) Deliver {
 }
 
 //TakeWhile 如果测试函数返回false则完成
-func TakeWhile(f func(Any) bool) Deliver {
+func TakeWhile(f func(interface{}) bool) Deliver {
 	return deliver(func(d Any, n Next, s Stop) (goon bool) {
 		if goon = f(d); goon {
 			n <- d
@@ -27,8 +27,8 @@ func TakeWhile(f func(Any) bool) Deliver {
 }
 
 //TakeUntil 直到开关事件流发出事件前一直接受事件
-func TakeUntil(sSrc Observable, sources ...Deliver) Deliver {
-	sSrc = Pipe(sSrc, sources...)
+func TakeUntil(sSrc Observable, delivers ...Deliver) Deliver {
+	sSrc = Pipe(sSrc, delivers...)
 	return func(source Observable) Observable {
 		return func(next Next, s Stop) {
 			ssNext := make(Next)
@@ -95,7 +95,7 @@ func Skip(count int) Deliver {
 }
 
 //SkipWhile 如果测试函数返回false则开始传送
-func SkipWhile(f func(Any) bool) Deliver {
+func SkipWhile(f func(interface{}) bool) Deliver {
 	return func(source Observable) Observable {
 		return func(next Next, stop Stop) {
 			activate := false
@@ -112,8 +112,8 @@ func SkipWhile(f func(Any) bool) Deliver {
 }
 
 //SkipUntil 直到开关事件流发出事件前一直跳过事件
-func SkipUntil(sSrc Observable, sources ...Deliver) Deliver {
-	sSrc = Pipe(sSrc, sources...)
+func SkipUntil(sSrc Observable, delivers ...Deliver) Deliver {
+	sSrc = Pipe(sSrc, delivers...)
 	return func(source Observable) Observable {
 		return func(next Next, s Stop) {
 			activate := false

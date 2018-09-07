@@ -1,7 +1,7 @@
 package rx
 
 //Subject 可以编程发送数据的Observable,input 为用于发送数据的外部数据源
-func Subject(source Observable, input <-chan Any) Observable {
+func Subject(source Observable, input <-chan interface{}) Observable {
 	var _next Next
 	go func() {
 		for d := range input {
