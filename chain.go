@@ -77,9 +77,29 @@ func From(source interface{}) *Observable {
     return &Observable{p.From(source)}
 }
 
+//Empty 
+func Empty() *Observable {
+    return &Observable{p.Empty()}
+}
+
+//Never 
+func Never() *Observable {
+    return &Observable{p.Never()}
+}
+
+//Throw 
+func Throw(e error) *Observable {
+    return &Observable{p.Throw(e)}
+}
+
 //Interval 
 func Interval(period time.Duration) *Observable {
     return &Observable{p.Interval(period)}
+}
+
+//Timer 
+func Timer(dueTime time.Duration, period time.Duration) *Observable {
+    return &Observable{p.Timer(dueTime, period)}
 }
 
 //Share 
@@ -164,7 +184,7 @@ func (this *Observable) Pairwise() *Observable {
 
 //SwitchMap 
 func (this *Observable) SwitchMap(f func(interface{}) Observable, combineResults func(interface{}, interface{}) interface{}) *Observable {
-    return &Observable{p.SwitchMap(func(d interface{}) p.Observable {return f(d).source}, combineResults, interface{}))(this.source)}
+    return &Observable{p.SwitchMap(func(d interface{}) p.Observable {return f(d).source}, combineResults)(this.source)}
 }
 
 //SwitchMapTo 

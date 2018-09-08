@@ -50,3 +50,35 @@ func From(source interface{}) Observable {
 	}
 	return Of(source)
 }
+func empty(n Next, s Stop) {
+	close(n)
+}
+
+//Empty Creates an Observable that emits no items to the Observer and immediately emits a complete notification.
+func Empty() Observable {
+	return empty
+}
+
+func never(n Next, s Stop) {
+}
+
+//Never Creates an Observable that do nothing forever and ever
+func Never() Observable {
+	return never
+}
+
+//Throw Creates an Observable that emits no items to the Observer and immediately emits an error notification.
+func Throw(e error) Observable {
+	return func(n Next, s Stop) {
+		n <- e
+		close(n)
+	}
+}
+
+//Defer Creates an Observable that, on subscribe, calls an Observable factory to make an Observable for each new Observer.
+//Creates the Observable lazily, that is, only when it is subscribed.
+func Defer(f func() Observable) Observable {
+	return func(n Next, s Stop) {
+		f()(n, s)
+	}
+}

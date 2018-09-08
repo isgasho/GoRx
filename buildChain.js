@@ -34,16 +34,14 @@ func Subject(source Observable, input <-chan interface{}) *Observable {
 
 function getArgs(s) {
     if (!s) return s
-    const funcReg = /func *\(([^()]+)\)/
-    let g = funcReg.exec(s)
-    if (g) s = s.replace(g[0], 'func')
+    s = s.replace(/func *\(([^()]+)\)/g, 'func')
     return s.split(', ').map(x => {
         let [name, type, funcType] = x.split(' ')
         if (name == 'sources') name = `changeTop(${name})`
         if (type.startsWith('...')) name += '...'
         else if (type == "Observable") name += '.source'
         else if (type == 'func' && funcType == 'Observable') {
-            name = `func(d ${g[1]}) p.Observable {return ${name}(d).source}`
+            name = `func(d interface{}) p.Observable {return ${name}(d).source}`
         }
         return name
     }).join(', ')

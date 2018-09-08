@@ -6,7 +6,8 @@ import (
 	"time"
 )
 
-//Interval 定时器 period 毫秒数
+//Interval Creates an Observable that emits sequential numbers every specified interval of time
+//period: The interval size in milliseconds
 func Interval(period time.Duration) Observable {
 	return func(n Next, s Stop) {
 		timer := time.NewTicker(period * time.Millisecond)
@@ -24,7 +25,8 @@ func Interval(period time.Duration) Observable {
 	}
 }
 
-//Delay 延迟一定毫秒数后激活
+//Delay Delays the emission of items from the source Observable by a given timeout.
+//delay: The delay duration in milliseconds
 func Delay(delay time.Duration) Deliver {
 	type bufferData struct {
 		t time.Time
@@ -71,17 +73,30 @@ func Delay(delay time.Duration) Deliver {
 					}
 					if isError(d, next) {
 						return
-					} else {
-						buffer.PushBack(bufferData{time.Now(), d})
-						if buffer.Len() == 1 {
-							wg.Add(1)
-							go pop(delay)
-						}
+					}
+					buffer.PushBack(bufferData{time.Now(), d})
+					if buffer.Len() == 1 {
+						wg.Add(1)
+						go pop(delay)
 					}
 				case <-stop:
 					return
 				}
 			}
+		}
+	}
+}
+
+//Timer Creates an Observable that starts emitting after an initialDelay and emits ever increasing numbers after each period of time thereafter.
+//Its like Interval, but you can specify when should the emissions start.
+func Timer(dueTime time.Duration, period time.Duration) Observable {
+	interval := Interval(period)
+	return func(n Next, s Stop) {
+		select {
+		case <-s:
+			return
+		case <-time.After(dueTime * time.Millisecond):
+			interval(n, s)
 		}
 	}
 }
