@@ -18,10 +18,12 @@ func changeTop(sources []Observable) (pSources []p.Observable) {
 	}
 	return
 }
+
 //Pipe
-func (this *Observable) Pipe(cbs ...p.Deliver) *Observable {
-	return &Observable{p.Pipe(this.source, cbs...)}
+func (observable *Observable) Pipe(cbs ...p.Deliver) *Observable {
+	return &Observable{p.Pipe(observable.source, cbs...)}
 }
+
 //Subject
 func Subject(source Observable, input <-chan interface{}) *Observable {
 	return &Observable{p.Subject(source.source, input)}
@@ -92,6 +94,11 @@ func Throw(e error) *Observable {
     return &Observable{p.Throw(e)}
 }
 
+//Defer 
+func Defer(f func() Observable) *Observable {
+    return &Observable{p.Defer(func() p.Observable {return f().source})}
+}
+
 //Interval 
 func Interval(period time.Duration) *Observable {
     return &Observable{p.Interval(period)}
@@ -103,101 +110,101 @@ func Timer(dueTime time.Duration, period time.Duration) *Observable {
 }
 
 //Share 
-func (this *Observable) Share() *Observable {
-    return &Observable{p.Share()(this.source)}
+func (observable *Observable) Share() *Observable {
+    return &Observable{p.Share()(observable.source)}
 }
 
 //StartWith 
-func (this *Observable) StartWith(xs ...interface{}) *Observable {
-    return &Observable{p.StartWith(xs...)(this.source)}
+func (observable *Observable) StartWith(xs ...interface{}) *Observable {
+    return &Observable{p.StartWith(xs...)(observable.source)}
 }
 
 //Take 
-func (this *Observable) Take(count int) *Observable {
-    return &Observable{p.Take(count)(this.source)}
+func (observable *Observable) Take(count int) *Observable {
+    return &Observable{p.Take(count)(observable.source)}
 }
 
 //TakeWhile 
-func (this *Observable) TakeWhile(f func(interface{}) bool) *Observable {
-    return &Observable{p.TakeWhile(f)(this.source)}
+func (observable *Observable) TakeWhile(f func(interface{}) bool) *Observable {
+    return &Observable{p.TakeWhile(f)(observable.source)}
 }
 
 //TakeUntil 
-func (this *Observable) TakeUntil(sSrc Observable, delivers ...p.Deliver) *Observable {
-    return &Observable{p.TakeUntil(sSrc.source, delivers...)(this.source)}
+func (observable *Observable) TakeUntil(sSrc Observable, delivers ...p.Deliver) *Observable {
+    return &Observable{p.TakeUntil(sSrc.source, delivers...)(observable.source)}
 }
 
 //TakeLast 
-func (this *Observable) TakeLast(count int) *Observable {
-    return &Observable{p.TakeLast(count)(this.source)}
+func (observable *Observable) TakeLast(count int) *Observable {
+    return &Observable{p.TakeLast(count)(observable.source)}
 }
 
 //Skip 
-func (this *Observable) Skip(count int) *Observable {
-    return &Observable{p.Skip(count)(this.source)}
+func (observable *Observable) Skip(count int) *Observable {
+    return &Observable{p.Skip(count)(observable.source)}
 }
 
 //SkipWhile 
-func (this *Observable) SkipWhile(f func(interface{}) bool) *Observable {
-    return &Observable{p.SkipWhile(f)(this.source)}
+func (observable *Observable) SkipWhile(f func(interface{}) bool) *Observable {
+    return &Observable{p.SkipWhile(f)(observable.source)}
 }
 
 //SkipUntil 
-func (this *Observable) SkipUntil(sSrc Observable, delivers ...p.Deliver) *Observable {
-    return &Observable{p.SkipUntil(sSrc.source, delivers...)(this.source)}
+func (observable *Observable) SkipUntil(sSrc Observable, delivers ...p.Deliver) *Observable {
+    return &Observable{p.SkipUntil(sSrc.source, delivers...)(observable.source)}
 }
 
 //Reduce 
-func (this *Observable) Reduce(f func(interface{}, interface{}) interface{}, seed ...interface{}) *Observable {
-    return &Observable{p.Reduce(f, seed...)(this.source)}
+func (observable *Observable) Reduce(f func(interface{}, interface{}) interface{}, seed ...interface{}) *Observable {
+    return &Observable{p.Reduce(f, seed...)(observable.source)}
 }
 
 //Count 
-func (this *Observable) Count(f func(interface{}) bool) *Observable {
-    return &Observable{p.Count(f)(this.source)}
+func (observable *Observable) Count(f func(interface{}) bool) *Observable {
+    return &Observable{p.Count(f)(observable.source)}
 }
 
 //Delay 
-func (this *Observable) Delay(delay time.Duration) *Observable {
-    return &Observable{p.Delay(delay)(this.source)}
+func (observable *Observable) Delay(delay time.Duration) *Observable {
+    return &Observable{p.Delay(delay)(observable.source)}
 }
 
 //Scan 
-func (this *Observable) Scan(f func(interface{}, interface{}) interface{}, seed ...interface{}) *Observable {
-    return &Observable{p.Scan(f, seed...)(this.source)}
+func (observable *Observable) Scan(f func(interface{}, interface{}) interface{}, seed ...interface{}) *Observable {
+    return &Observable{p.Scan(f, seed...)(observable.source)}
 }
 
 //Map 
-func (this *Observable) Map(f func(interface{}) interface{}) *Observable {
-    return &Observable{p.Map(f)(this.source)}
+func (observable *Observable) Map(f func(interface{}) interface{}) *Observable {
+    return &Observable{p.Map(f)(observable.source)}
 }
 
 //MapTo 
-func (this *Observable) MapTo(x interface{}) *Observable {
-    return &Observable{p.MapTo(x)(this.source)}
+func (observable *Observable) MapTo(x interface{}) *Observable {
+    return &Observable{p.MapTo(x)(observable.source)}
 }
 
 //Pairwise 
-func (this *Observable) Pairwise() *Observable {
-    return &Observable{p.Pairwise()(this.source)}
+func (observable *Observable) Pairwise() *Observable {
+    return &Observable{p.Pairwise()(observable.source)}
 }
 
 //SwitchMap 
-func (this *Observable) SwitchMap(f func(interface{}) Observable, combineResults func(interface{}, interface{}) interface{}) *Observable {
-    return &Observable{p.SwitchMap(func(d interface{}) p.Observable {return f(d).source}, combineResults)(this.source)}
+func (observable *Observable) SwitchMap(f func(interface{}) Observable, combineResults func(interface{}, interface{}) interface{}) *Observable {
+    return &Observable{p.SwitchMap(func(arg0 interface{}) p.Observable {return f(arg0).source}, combineResults)(observable.source)}
 }
 
 //SwitchMapTo 
-func (this *Observable) SwitchMapTo(source Observable, combineResults func(interface{}, interface{}) interface{}) *Observable {
-    return &Observable{p.SwitchMapTo(source.source, combineResults)(this.source)}
+func (observable *Observable) SwitchMapTo(source Observable, combineResults func(interface{}, interface{}) interface{}) *Observable {
+    return &Observable{p.SwitchMapTo(source.source, combineResults)(observable.source)}
 }
 
 //BufferTime 
-func (this *Observable) BufferTime(period time.Duration, maxBufferSize int) *Observable {
-    return &Observable{p.BufferTime(period, maxBufferSize)(this.source)}
+func (observable *Observable) BufferTime(period time.Duration, maxBufferSize int) *Observable {
+    return &Observable{p.BufferTime(period, maxBufferSize)(observable.source)}
 }
 
 //Repeat 
-func (this *Observable) Repeat(count int) *Observable {
-    return &Observable{p.Repeat(count)(this.source)}
+func (observable *Observable) Repeat(count int) *Observable {
+    return &Observable{p.Repeat(count)(observable.source)}
 }

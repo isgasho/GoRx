@@ -1,0 +1,30 @@
+package rx
+
+import (
+	"time"
+
+	p "github.com/langhuihui/gorx/pipe"
+)
+
+//Observable emit data
+type Observable struct {
+	source p.Observable
+}
+
+func changeTop(sources []Observable) (pSources []p.Observable) {
+	pSources = make([]p.Observable, len(sources))
+	for i, source := range sources {
+		pSources[i] = source.source
+	}
+	return
+}
+
+//Pipe
+func (observable *Observable) Pipe(cbs ...p.Deliver) *Observable {
+	return &Observable{p.Pipe(observable.source, cbs...)}
+}
+
+//Subject
+func Subject(source Observable, input <-chan interface{}) *Observable {
+	return &Observable{p.Subject(source.source, input)}
+}

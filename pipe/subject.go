@@ -1,6 +1,7 @@
 package rx
 
-//Subject 可以编程发送数据的Observable,input 为用于发送数据的外部数据源
+//Subject Represents an object that is both an observable sequence as well as an observer.
+//Each notification is broadcasted to all subscribed observers.
 func Subject(source Observable, input <-chan interface{}) Observable {
 	var _next Next
 	go func() {

@@ -2,6 +2,17 @@
 *ReactiveX* is a new, alternative way of asynchronous programming to callbacks, promises and deferred. It is about processing streams of events or items, with events being any occurrences or changes within the system.
 
 [doc](https://godoc.org/github.com/langhuihui/GoRx/pipe)
+
+# get GoRx
+```bash
+go get github.com/langhuihui/gorx
+```
+
+# build chain.go
+```bash
+node buildChain.js
+```
+
 # usage
 
 GoRx's usage is very like RxJs. However implemention by Golang is very different with Javascript
@@ -39,4 +50,30 @@ An `Observable` is a synchronous stream of "emitted" values which can be either 
 Start          value            value             error              Done
 
 ```
+
+## How it works
+
+ - An `Observable` is a function looks like `func(Next,Stop)`.
+ - `type Next chan interface{}` used to receive values.
+ - `type Stop chan bool` used to unsubscribe streams.
+ - Closing a `Next` means stream complete.
+ - Calling an `Observable` means subscribe this Obserable.
+ - Closing a `Stop` means unsubscribe a stream.
+
+ ### example
+
+ ```go
+ func simpleObservable(n Next,s Stop){
+	 n<-1//emit a value '1'
+	 close(n)//complete
+ }
+ //subscribe simpleObservable
+ next:=make(Next)
+ stop:=make(Stop)
+ go simpleObservable(next,stop)//now we subscribe
+ for d:= range next{
+	 //we will get values here
+ }
+ //we can do something here when complete
+ ```
 
