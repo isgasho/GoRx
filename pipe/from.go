@@ -34,7 +34,6 @@ func FromChan(source chan interface{}) Observable {
 					close(n)
 					return
 				}
-			default:
 			}
 		}
 	}
@@ -80,5 +79,20 @@ func Throw(e error) Observable {
 func Defer(f func() Observable) Observable {
 	return func(n Next, s Stop) {
 		f()(n, s)
+	}
+}
+
+//Range Creates an Observable that emits a sequence of numbers within a specified range.
+func Range(start int, count int) Observable {
+	return func(n Next, s Stop) {
+		for i, end := start, start+count; i < end; i++ {
+			select {
+			case <-s:
+				return
+			default:
+				n <- i
+			}
+		}
+		close(n)
 	}
 }

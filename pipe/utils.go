@@ -27,8 +27,6 @@ func _deliver(nn func(Any, Next, Stop) bool, source Observable, next Next, stop 
 			}
 		case <-stop:
 			return
-		default:
-
 		}
 	}
 }

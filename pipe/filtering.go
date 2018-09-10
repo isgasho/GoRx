@@ -44,7 +44,6 @@ func TakeUntil(sSrc Observable, delivers ...Deliver) Deliver {
 						close(next)
 						return
 					}
-				default:
 				}
 			}
 		}
@@ -140,7 +139,6 @@ func SkipUntil(sSrc Observable, delivers ...Deliver) Deliver {
 						activate = true
 						close(stopS)
 					}
-				default:
 				}
 			}
 		}
@@ -158,5 +156,48 @@ func IgnoreElements(source Observable) Observable {
 			}
 		}
 		close(next)
+	}
+}
+
+//Filter Filter items emitted by the source Observable by only emitting those that satisfy a specified predicate.
+func Filter(f func(interface{}) bool) Deliver {
+	return deliver(func(d Any, n Next, s Stop) bool {
+		if f(d) {
+			n <- d
+		}
+		return true
+	})
+}
+
+//ElementAt Emits the single value at the specified index in a sequence of emissions from the source Observable.
+func ElementAt(count int, defaultValue interface{}) Deliver {
+	return func(source Observable) Observable {
+		return func(next Next, stop Stop) {
+			_count := count
+			sNext := make(Next)
+			go source(sNext, stop)
+			for {
+				select {
+				case d, ok := <-sNext:
+					if !ok {
+						if defaultValue != nil {
+							next <- defaultValue
+						}
+						close(next)
+						return
+					}
+					if isError(d, next) {
+						return
+					} else if _count--; _count == 0 {
+						next <- d
+						close(stop)
+						close(next)
+						return
+					}
+				case <-stop:
+					return
+				}
+			}
+		}
 	}
 }

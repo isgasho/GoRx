@@ -35,7 +35,6 @@ func Scan(f func(interface{}, interface{}) interface{}, seed ...interface{}) Del
 					next <- aac
 				case <-stop:
 					return
-				default:
 				}
 			}
 		}
@@ -130,7 +129,6 @@ func SwitchMap(f func(interface{}) Observable, combineResults func(interface{}, 
 						}
 						waitInnerStop = true
 					}
-				default:
 				}
 			}
 		}
@@ -174,7 +172,6 @@ func BufferTime(period time.Duration, maxBufferSize int) Deliver {
 						close(next)
 						return
 					}
-				default:
 				}
 			}
 		}

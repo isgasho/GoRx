@@ -34,7 +34,6 @@ func Reduce(f func(interface{}, interface{}) interface{}, seed ...interface{}) D
 					}
 				case <-stop:
 					return
-				default:
 				}
 			}
 		}
@@ -50,3 +49,20 @@ func Count(f func(interface{}) bool) Deliver {
 		return aac
 	}, 0)
 }
+
+//Max
+// func Max() Deliver {
+// 	return Reduce(func(aac interface{}, c interface{}) interface{} {
+// 		switch aac.(type) {
+// 		case int:
+// 			if c.(int) > aac.(int) {
+// 				return c
+// 			}
+// 		case int64:
+// 			if c.(int64) > aac.(int64) {
+// 				return c
+// 			}
+// 		}
+// 		return aac
+// 	}, 0)
+// }
