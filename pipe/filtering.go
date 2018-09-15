@@ -1,5 +1,7 @@
 package rx
 
+import "errors"
+
 //Take 获取最多count数量的事件，然后完成
 func Take(count int) Deliver {
 	return func(source Observable) Observable {
@@ -192,6 +194,162 @@ func ElementAt(count int, defaultValue interface{}) Deliver {
 						next <- d
 						close(stop)
 						close(next)
+						return
+					}
+				case <-stop:
+					return
+				}
+			}
+		}
+	}
+}
+
+//Throttle Emits a value from the source Observable, then ignores subsequent source values for a duration determined by another Observable, then repeats this process.
+func Throttle(durationSelector func(interface{}) Observable, leading bool, trailing bool) Deliver {
+	return func(source Observable) Observable {
+		return func(next Next, stop Stop) {
+			var tNext Next
+			var tStop Stop
+			sNext, cache := make(Next), make(chan Any)
+			throttle := func(value Any) {
+				tNext, tStop = make(Next), make(Stop)
+				go durationSelector(value)(tNext, tStop)
+			}
+			send := func() {
+				select {
+				case d := <-cache:
+					next <- d
+					throttle(d)
+				default:
+				}
+			}
+			throttleDone := func() {
+				if tStop != nil {
+					close(tStop)
+					tStop = nil
+				}
+				if trailing {
+					send()
+				}
+			}
+			go source(sNext, stop)
+			for {
+				select {
+				case <-stop:
+					if tStop != nil {
+						close(tStop)
+					}
+					return
+				case <-tNext:
+					throttleDone()
+					return
+				case d, ok := <-sNext:
+					if ok {
+						if isError(d, next) {
+							return
+						}
+						select {
+						case <-cache:
+						default:
+						}
+						cache <- d
+						if tStop == nil {
+							if leading {
+								send()
+							} else {
+								throttle(d)
+							}
+						}
+					} else {
+						throttleDone()
+						close(next)
+					}
+				}
+			}
+		}
+	}
+}
+
+//Audit Ignores source values for a duration determined by another Observable, then emits the most recent value from the source Observable, then repeats this process.
+func Audit(durationSelector func(interface{}) Observable) Deliver {
+	return Throttle(durationSelector, false, true)
+}
+
+//FindIndex Emits only the index of the first value emitted by the source Observable that meets some condition.
+func FindIndex(f func(interface{}) bool) Deliver {
+	return func(source Observable) Observable {
+		return func(next Next, stop Stop) {
+			i := 0
+			_deliver(func(d Any, n Next, s Stop) bool {
+				if f(d) {
+					n <- i
+					return false
+				}
+				i++
+				return true
+			}, source, next, stop)
+		}
+	}
+}
+
+//First Emits only the first value (or the first value that meets some condition) emitted by the source Observable.
+func First(f func(interface{}) bool, defaultValue interface{}) Deliver {
+	return func(source Observable) Observable {
+		return func(next Next, stop Stop) {
+			sNext := make(Next)
+			value := defaultValue
+			go source(sNext, stop)
+			for {
+				select {
+				case d, ok := <-sNext:
+					if !ok {
+						if value != nil {
+							next <- value
+						} else {
+							next <- errors.New("no elements in sequence")
+						}
+						close(next)
+						return
+					}
+					if isError(d, next) {
+						return
+					} else if f == nil || f(d) {
+						next <- d
+						close(stop)
+						close(next)
+						return
+					}
+				case <-stop:
+					return
+				}
+			}
+		}
+	}
+}
+
+//Last Returns an Observable that emits only the last item emitted by the source Observable. It optionally takes a predicate function as a parameter, in which case, rather than emitting the last item from the source Observable, the resulting Observable will emit the last item from the source Observable that satisfies the predicate.
+func Last(f func(interface{}) bool, defaultValue interface{}) Deliver {
+	return func(source Observable) Observable {
+		return func(next Next, stop Stop) {
+			sNext := make(Next)
+			value := defaultValue
+			go source(sNext, stop)
+			for {
+				select {
+				case d, ok := <-sNext:
+					if !ok {
+						if value != nil {
+							next <- value
+						} else {
+							next <- errors.New("no elements in sequence")
+						}
+						close(next)
+						return
+					}
+					if isError(d, next) {
+						return
+					} else if f == nil || f(d) {
+						value = d
 						return
 					}
 				case <-stop:

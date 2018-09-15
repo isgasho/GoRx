@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-//Scan 类似Reduce，但每次都会把结果发出去
+//Scan Applies an accumulator function over the source Observable, and returns each intermediate result, with an optional seed value.
 func Scan(f func(interface{}, interface{}) interface{}, seed ...interface{}) Deliver {
 	return func(source Observable) Observable {
 		return func(next Next, stop Stop) {
@@ -41,7 +41,7 @@ func Scan(f func(interface{}, interface{}) interface{}, seed ...interface{}) Del
 	}
 }
 
-//Map 映射
+//Map Applies a given project function to each value emitted by the source Observable, and emits the resulting values as an Observable.
 func Map(f func(interface{}) interface{}) Deliver {
 	return deliver(func(d Any, n Next, s Stop) bool {
 		n <- f(d)
@@ -49,7 +49,7 @@ func Map(f func(interface{}) interface{}) Deliver {
 	})
 }
 
-//MapTo 映射到一个固定值
+//MapTo Emits the given constant value on the output Observable every time the source Observable emits a value.
 func MapTo(x interface{}) Deliver {
 	return deliver(func(d Any, n Next, s Stop) bool {
 		n <- x
@@ -57,7 +57,7 @@ func MapTo(x interface{}) Deliver {
 	})
 }
 
-//Pairwise 将前一个元素和当前元素组成一组发送
+//Pairwise Groups pairs of consecutive emissions together and emits them as an array of two values.
 func Pairwise() Deliver {
 	return func(source Observable) Observable {
 		return func(next Next, stop Stop) {
@@ -77,7 +77,7 @@ func Pairwise() Deliver {
 	}
 }
 
-//SwitchMap 切换数据源
+//SwitchMap Projects each source value to an Observable which is merged in the output Observable, emitting values only from the most recently projected Observable.
 func SwitchMap(f func(interface{}) Observable, combineResults func(interface{}, interface{}) interface{}) Deliver {
 	return func(source Observable) Observable {
 		return func(next Next, stop Stop) {
@@ -135,14 +135,14 @@ func SwitchMap(f func(interface{}) Observable, combineResults func(interface{}, 
 	}
 }
 
-//SwitchMapTo 切换到固定的源
+//SwitchMapTo Projects each source value to the same Observable which is flattened multiple times with switchMap in the output Observable.
 func SwitchMapTo(source Observable, combineResults func(interface{}, interface{}) interface{}) Deliver {
 	return SwitchMap(func(d interface{}) Observable {
 		return source
 	}, combineResults)
 }
 
-//BufferTime 缓存固定时间的数据
+//BufferTime Buffers the source Observable values for a specific time period.
 func BufferTime(period time.Duration, maxBufferSize int) Deliver {
 	return func(source Observable) Observable {
 		return func(next Next, stop Stop) {
@@ -178,7 +178,7 @@ func BufferTime(period time.Duration, maxBufferSize int) Deliver {
 	}
 }
 
-//Repeat 重复之前的行为N次
+//Repeat Returns an Observable that repeats the stream of items emitted by the source Observable at most count times.
 func Repeat(count int) Deliver {
 	return func(source Observable) Observable {
 		return func(next Next, stop Stop) {
